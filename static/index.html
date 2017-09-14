@@ -1,0 +1,147 @@
+
+<!DOCTYPE html>
+<html>
+ <head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+  <title>OneLife рассылка писем</title>
+  <!-- <link rel="stylesheet" href="css/style.css" /> -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+   <!-- <meta http-equiv="refresh" content="3;"> -->
+</head>
+<style>
+  body{
+    margin: 0;
+    padding: 0;
+    background-color: whitesmoke;
+
+  }
+  .full{
+    position: relative;
+    margin: 0 auto;
+    background-color: white;
+    width: 900px;
+  }
+  .inscription{
+    margin: 0 330px;
+    font-family: Verdana;
+
+  }
+  #listemail{
+    margin: 20px 240px;
+    width: 400px;
+    height: 200px;
+  }
+  #clicksend{
+    width: 200px;
+    height: 30px;
+    background-color: #ff9800;
+    color: #505050;
+    font-family: Verdana;
+    border: none;
+    border-radius: 5px;
+    margin-left: 240px;
+  }
+  #listOfMails{
+    width: 200px;
+    height: 30px;
+    background-color: #ff9800;
+    color: #505050;
+    font-family: Verdana;
+    border: none;
+  }
+  table {
+      border-collapse: collapse;
+      width: 100%;
+  }
+
+  th, td {
+      text-align: left;
+      padding: 8px;
+  }
+
+  tr:nth-child(even){background-color: #f2f2f2}
+
+
+</style>
+<script>
+
+jQuery(document).ready(function ($) { // wait until the document is ready
+  $('#clicksend').click(function(){
+    var argument = $("#listemail").val();
+    var current_mail = $("#listOfMails").val();
+    if($("#listemail").val().length <= 3){
+      alert('Please write the emails');
+    }else{
+      var listemails = argument.split("\n");
+
+      alert('The email list: ' + listemails + '\n' + 'The mail which you want to send: ' + current_mail);
+
+      $.ajax({
+           url: '/api/sendlist',
+           type: 'post',
+           data: { mails: listemails, content: current_mail},
+           dataType: 'text',
+           cache: false,
+           success: function (){
+
+          }
+      });
+    }
+  });
+
+  setTimeout(function(){
+    $.ajax({
+      url: '/api/getuserlist',
+      type: 'get',
+      cache: false,
+      success: function (info){
+        document.getElementById('usertb').innerHTML = info.users;
+/////////////////new//////////////////////////
+        info.content.forEach(function(mail){
+//            console.log("get user list mail")
+          document.getElementById('listOfMails').innerHTML += '<option value="' + mail + '">' + mail + '</option>';
+          console.log(mail);
+        });
+
+        info.all_statistics.forEach(function(item){
+//          console.log("item all statistics");
+         document.getElementById('all_statistics').innerHTML += '<h4>' + item.content + '</h4><p>Прочитали: <b>' + item.allopen + '</b> ||| Прошли по ссылке: <b>' + item.allclick + '</b></p><br>';
+        });
+
+
+
+
+
+
+      }
+    })
+  }, 500);
+
+});
+
+  // document.getElementById('opensum').innerHTML = opensum;
+
+</script>
+  <body>
+  <div class="full">
+      <div class="inscription">Список почты клиентов</div>
+    <!-- <form id="listemailform" onsubmit="zag();"> -->
+      <textarea id="listemail"> </textarea>
+      <input type="button" id="clicksend" value="Отправить" >
+      <!-- button for edit mail's content -->
+      <select id="listOfMails"></select>
+
+
+      <!-- onclick="getlistmail(document.getElementById('listemail').value)" -->
+    <!-- </form> -->
+
+    <div id="all_statistics" style="text-align: center;">
+<!-- <h4></h4><p>Прочитали: <b></b>||| Прошли по ссылке: <b></b></p>
+ -->    </div>
+
+
+  <table id="usertb">
+  </table>
+  </div>
+  </body>
+</html>
